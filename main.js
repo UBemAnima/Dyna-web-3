@@ -17,8 +17,8 @@ const config = {
   }
 };
 
-let player, cursors, helpers = [], enemies = [], helperButton;
-let nextEnemyTime = 0;
+let player, cursors, helpers = [], enemies = [], ui = {};
+let helperMode = true;
 
 const game = new Phaser.Game(config);
 
@@ -27,6 +27,7 @@ function preload() {
   this.load.image('helper', 'assets/helper.png');
   this.load.image('enemy', 'assets/enemy.png');
   this.load.image('background', 'assets/tileset.png');
+  this.load.image('button', 'assets/button.png');
 }
 
 function create() {
@@ -36,13 +37,22 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
 
-  helperButton = this.add.text(650, 560, 'Criar Ajudante', { fill: '#0f0', fontSize: '20px' })
-    .setInteractive()
-    .on('pointerdown', () => {
-      const helper = this.physics.add.sprite(player.x + 20, player.y, 'helper');
-      helpers.push(helper);
-    });
+  // HUD - Criar ajudante
+  ui.createHelperBtn = this.add.text(20, 540, '[Criar Ajudante]', {
+    fontSize: '20px', fill: '#0f0', backgroundColor: '#333', padding: 10
+  }).setInteractive().on('pointerdown', () => {
+    const helper = this.physics.add.sprite(player.x + 20, player.y, 'helper');
+    helpers.push(helper);
+  });
 
+  // HUD - Parar ajudantes
+  ui.stopHelpersBtn = this.add.text(220, 540, '[Parar Todos]', {
+    fontSize: '20px', fill: '#ff0', backgroundColor: '#333', padding: 10
+  }).setInteractive().on('pointerdown', () => {
+    helpers.forEach(h => h.setVelocity(0));
+  });
+
+  // Spawn inimigos periodicamente
   this.time.addEvent({
     delay: 3000,
     loop: true,
